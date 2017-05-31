@@ -56,6 +56,7 @@ dependencies {
  
 ##### Server 版本檢查
 - 伺服器接收參數 pkgName。
+
 ###### 伺服器回傳格式
 
 ``` json
