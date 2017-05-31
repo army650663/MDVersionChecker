@@ -48,6 +48,7 @@ dependencies {
 ##### Server 版本檢查
 **伺服器回傳格式**
 - 伺服器接收參數 pkgName。
+
 ``` json
     {
       "result": true,
