@@ -46,7 +46,7 @@ dependencies {
  ``` 
  
 ##### Server 版本檢查
-**伺服器回傳格式**
+**伺服器回傳格式 JSON**
 - 伺服器接收參數 pkgName。
 
 ``` json
@@ -63,23 +63,36 @@ dependencies {
 ```
 
 ``` java
-    HashMap<String, String> map = new HashMap<>();
-    map.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, "This permission use update");
-    map.put(Manifest.permission.READ_SMS, "This permission send sms");
-    new MDPermission(this)
-            .addPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_SMS)
-            .addRationale(map)
-            .setRationaleButtonText("好Der")
-            .start(new MDPermission.PermissionCallbacks() {
-                @Override
-                public void success(List<String> perms) {
-                    Log.i(TAG, "success: " + perms.toString());
-              
-                @Override
-                public void fail(List<String> perms) {
-                    Log.i(TAG, "fail: " + perms.toString());
-                }
-            });
+    new MDVersionChecker()
+        .checkServer("http://pub.mysoqi.com/appupdate/index1.php", "com.agenttw", "1.32.060")
+        // optional : 設定讀取視窗
+        .setLoadingView(this, "Check", "Version checking")
+        // optional : 設定更新視窗
+        .setUpdateDialog(this, "System info", "Need to update")
+        // optional : 設定使用者取消動作
+        .setCancelButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                finish();
+            }
+        })
+        // 開始檢查
+        .check(new MDVersionChecker.CheckVersionCallback() {
+            @Override
+            public void same(Map<String, String> infoMap) {
+                Log.i(TAG, "same: " + infoMap.toString());
+        
+            @Override
+            public void different(Map<String, String> infoMap, AlertDialog.Builder updateDialog) {
+                Log.i(TAG, "different: " + infoMap.toString());
+                updateDialog.show();
+        
+            @Override
+            public void error(String error) {
+                Log.i(TAG, "error: " + error);
+            }
+        });
 ```
 
 

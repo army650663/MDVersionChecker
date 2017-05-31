@@ -1,6 +1,7 @@
 package tw.idv.madmanchen.mdversionchecker;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mContext = this;
         // 伺服器版本檢查
-        /*new MDVersionChecker()
+        new MDVersionChecker()
                 .checkServer("http://pub.mysoqi.com/appupdate/index1.php", "com.agenttw", "1.32.060")
                 // optional : 設定讀取視窗
                 .setLoadingView(this, "Check", "Version checking")
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                     public void error(String error) {
                         Log.i(TAG, "error: " + error);
                     }
-                });*/
+                });
 
         // Google Play 版本檢查
         new MDVersionChecker()
