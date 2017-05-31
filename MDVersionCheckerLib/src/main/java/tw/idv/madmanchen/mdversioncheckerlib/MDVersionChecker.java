@@ -1,4 +1,4 @@
-package madmanchen.idv.tw.mdversioncheckerlib;
+package tw.idv.madmanchen.mdversioncheckerlib;
 
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import madmanchen.idv.tw.mdversioncheckerlib.utils.FileUtils;
+import tw.idv.madmanchen.mdversioncheckerlib.utils.FileUtils;
 
 /**
  * Author:      chenshaowei

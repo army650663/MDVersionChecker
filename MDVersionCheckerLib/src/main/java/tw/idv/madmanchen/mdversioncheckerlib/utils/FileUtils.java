@@ -1,4 +1,4 @@
-package madmanchen.idv.tw.mdversioncheckerlib.utils;
+package tw.idv.madmanchen.mdversioncheckerlib.utils;
 
 import android.content.Context;
 import android.content.Intent;

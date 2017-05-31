@@ -9,7 +9,7 @@ import android.util.Log;
 
 import java.util.Map;
 
-import madmanchen.idv.tw.mdversioncheckerlib.MDVersionChecker;
+import tw.idv.madmanchen.mdversioncheckerlib.MDVersionChecker;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
