@@ -55,8 +55,8 @@ dependencies {
  ``` 
  
 ##### Server 版本檢查
-**伺服器回傳格式 JSON**
 - 伺服器接收參數 pkgName。
+###### 伺服器回傳格式
 
 ``` json
     {
@@ -70,6 +70,8 @@ dependencies {
       }
     }
 ```
+
+###### 伺服器版本檢查
 
 ``` java
     new MDVersionChecker()
