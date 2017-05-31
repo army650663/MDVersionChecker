@@ -10,8 +10,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.IntDef;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.webkit.URLUtil;
 
 import org.json.JSONObject;
@@ -76,6 +79,13 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
     private String providerName = "fileprovider";
     private int checkType = 0;
 
+
+    /**
+     * 至 Google Play 檢查版本
+     *
+     * @param pkgName 包名
+     * @param verName 版本名
+     */
     public MDVersionChecker checkGooglePlay(String pkgName, String verName) {
         checkType = GOOGLE_PLAY;
         this.pkgName = pkgName;
@@ -83,6 +93,13 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
         return this;
     }
 
+    /**
+     * 至 Server 檢查版本
+     *
+     * @param url     Server 網址
+     * @param pkgName 包名
+     * @param verName 版本名
+     */
     public MDVersionChecker checkServer(String url, String pkgName, String verName) {
         checkType = SERVER;
         this.url = url;
@@ -91,6 +108,13 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
         return this;
     }
 
+    /**
+     * 設定讀取視窗
+     *
+     * @param context Context
+     * @param title   標題
+     * @param msg     訊息
+     */
     public MDVersionChecker setLoadingView(Context context, String title, String msg) {
         mProgressDialog = new ProgressDialog(context);
         mProgressDialog.setTitle(title);
@@ -99,6 +123,13 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
         return this;
     }
 
+    /**
+     * 設定升級視窗
+     *
+     * @param context Context
+     * @param title   標題
+     * @param msg     訊息
+     */
     public MDVersionChecker setUpdateDialog(Context context, String title, String msg) {
         mAlertDialog = new AlertDialog.Builder(context);
         mAlertDialog.setTitle(title);
@@ -107,35 +138,72 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
         return this;
     }
 
+    /**
+     * 設定更新按鈕
+     *
+     * @param btnText  按鈕文字
+     * @param listener 監聽器
+     */
     public MDVersionChecker setUpdateButton(String btnText, DialogInterface.OnClickListener listener) {
         updateBtnText = btnText;
         mUpdateOnClickListener = listener;
         return this;
     }
 
+    /**
+     * 設定取消按鈕
+     *
+     * @param btnText  按鈕文字
+     * @param listener 監聽器
+     */
     public MDVersionChecker setCancelButton(String btnText, DialogInterface.OnClickListener listener) {
         cancelBtnText = btnText;
         mCanceloOnClickListener = listener;
         return this;
     }
 
+    /**
+     * 設定下載路徑
+     *
+     * @param path 檔案路徑
+     *             預設路徑為 Downloads 資料夾
+     */
     public MDVersionChecker setDownloadPath(String path) {
         this.downloadPath = path;
         return this;
     }
 
+    /**
+     * 設定 Provider 名稱
+     * <p>
+     * Android N 以上使用外部程式開啟內部檔案需要使用 Provider
+     *
+     * @param providerName Provider 名稱
+     */
     @TargetApi(Build.VERSION_CODES.N)
     public MDVersionChecker setProviderName(String providerName) {
         this.providerName = providerName;
         return this;
     }
 
-
+    /**
+     * 開始檢查
+     *
+     * @param callback 檢查回傳
+     */
     public void check(CheckVersionCallback callback) {
         this.mVersionCallback = callback;
-        execute();
+        execute(pkgName);
     }
 
+
+    /**
+     * 至 Google Play 取得版本名
+     * <p>
+     * 使用 Jsoup 抓取 Google Play html 版本名稱
+     *
+     * @param pkgName 包名
+     */
     private String getVerNameFromGooglePlay(String pkgName) {
         String url = "https://play.google.com/store/apps/details?id=" + pkgName;
         String verName = null;
@@ -157,6 +225,13 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
         return verName;
     }
 
+    /**
+     * 至 Server 取得版本名
+     * <p>
+     * 使用 API 取得版本名稱及 APK 下載位置
+     *
+     * @param pkgName 包名
+     */
     private String getVerNameFromServer(String pkgName) {
         String verName = null;
         String apkUrl = null;
@@ -204,6 +279,9 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
         return verName;
     }
 
+    /**
+     * 取得預設更新按鈕監聽器
+     */
     private DialogInterface.OnClickListener getDefaultUpdateOnClickListener() {
         return new DialogInterface.OnClickListener() {
             @Override
@@ -219,23 +297,26 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
                         break;
 
                     case SERVER:
+                        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                            mProgressDialog.dismiss();
+                        }
                         final String apkUrl = infoMap.get("apkUrl");
                         final String fileName = URLUtil.guessFileName(apkUrl, null, null);
                         final File apkFile = new File(downloadPath, fileName);
                         final Context context = mAlertDialog.getContext();
 
-                        mProgressDialog = new ProgressDialog(context);
-                        mProgressDialog.setMessage(fileName);
-                        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                        mProgressDialog.setProgressNumberFormat("%dKB/%dKB");
-                        mProgressDialog.show();
-
+                        final ProgressDialog downloadDialog = new ProgressDialog(context);
+                        downloadDialog.setMessage(fileName);
+                        downloadDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                        downloadDialog.setProgressNumberFormat("%dKB/%dKB");
+                        downloadDialog.show();
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 if (apkUrl != null) {
                                     try {
                                         URL url = new URL(apkUrl);
+                                        Log.i(TAG, "run: " + apkUrl);
                                         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                                         connection.setDoOutput(true);
                                         connection.setDoInput(true);
@@ -243,18 +324,34 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
                                             BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
 
                                             FileOutputStream fileOutputStream = new FileOutputStream(apkFile);
-                                            int fileLength = connection.getContentLength();
+                                            final int fileLength = connection.getContentLength();
                                             byte[] buffer = new byte[2048];
                                             int buffLen;
+                                            int readLen = 0;
 
                                             while ((buffLen = inputStream.read(buffer)) > 0) {
                                                 fileOutputStream.write(buffer, 0, buffLen);
-                                                mProgressDialog.setMax((int) (fileLength / Math.pow(1024, 1)));
-                                                mProgressDialog.setProgress((int) (fileLength / Math.pow(1024, 1)));
+                                                readLen += buffLen;
+                                                final int finalReadLen = readLen;
+                                                // Run on main thread
+                                                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        downloadDialog.setMax((int) (fileLength / Math.pow(1024, 1)));
+                                                        downloadDialog.setProgress((int) (finalReadLen / Math.pow(1024, 1)));
+                                                    }
+                                                });
+
                                             }
                                             inputStream.close();
                                             fileOutputStream.close();
-                                            mProgressDialog.dismiss();
+                                            // Run on main thread
+                                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    downloadDialog.dismiss();
+                                                }
+                                            });
                                             FileUtils.smartOpenFile(context, apkFile, providerName);
                                         }
                                     } catch (Exception e) {
@@ -272,6 +369,9 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
         };
     }
 
+    /**
+     * 取得預設取消按鈕監聽器
+     */
     private DialogInterface.OnClickListener getDefaultCancelOnClickListener() {
         return new DialogInterface.OnClickListener() {
             @Override
@@ -290,25 +390,19 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
     }
 
     @Override
-    protected void onProgressUpdate(Number... values) {
-        super.onProgressUpdate(values);
-        if (mProgressDialog != null) {
-            mProgressDialog.setProgress(values[0].intValue());
-            mProgressDialog.setMax(values[1].intValue());
-        }
-    }
-
-    @Override
     protected Boolean doInBackground(String... strings) {
         String verName = null;
         switch (checkType) {
             case GOOGLE_PLAY:
-                verName = getVerNameFromGooglePlay(pkgName);
+                verName = getVerNameFromGooglePlay(strings[0]);
                 break;
 
             case SERVER:
-                verName = getVerNameFromServer(pkgName);
+                verName = getVerNameFromServer(strings[0]);
                 break;
+        }
+        if (verName == null) {
+            return null;
         }
         return this.verName.equals(verName);
     }
@@ -320,31 +414,30 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
             mProgressDialog.dismiss();
         }
         if (mVersionCallback != null) {
-            if (aBoolean) {
-                mVersionCallback.same(infoMap);
-            } else {
-                if (mAlertDialog != null) {
-                    mAlertDialog.setNegativeButton(updateBtnText, mUpdateOnClickListener != null ? mUpdateOnClickListener : getDefaultUpdateOnClickListener());
-                    mAlertDialog.setNeutralButton(cancelBtnText, mCanceloOnClickListener != null ? mCanceloOnClickListener : getDefaultCancelOnClickListener());
+            if (aBoolean != null) {
+                if (aBoolean) {
+                    mVersionCallback.same(infoMap);
+                } else {
+                    if (mAlertDialog != null) {
+                        mAlertDialog.setNegativeButton(updateBtnText, mUpdateOnClickListener != null ? mUpdateOnClickListener : getDefaultUpdateOnClickListener());
+                        mAlertDialog.setNeutralButton(cancelBtnText, mCanceloOnClickListener != null ? mCanceloOnClickListener : getDefaultCancelOnClickListener());
+                    }
+                    mVersionCallback.different(infoMap, mAlertDialog);
                 }
-                mVersionCallback.different(infoMap, mAlertDialog);
             }
         }
     }
 
+    /**
+     * 檢查是否有可開啟的 Intent
+     *
+     * @param context Context
+     * @param intent  Intent
+     */
     private boolean haveIntent(Context context, Intent intent) {
         PackageManager packageManager = context.getPackageManager();
         List activities = packageManager.queryIntentActivities(intent,
                 PackageManager.MATCH_DEFAULT_ONLY);
         return activities.size() > 0;
-    }
-
-    /* Checks if external storage is available for read and write */
-    private boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
     }
 }
