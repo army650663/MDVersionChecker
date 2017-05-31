@@ -19,6 +19,15 @@ dependencies {
 }
 ```
 
+**2. Proguard**
+    - Add this to your app `proguard-rules.pro`
+    
+``` proguard
+  -keep public class org.jsoup.** {
+    public *;
+  }
+```
+
 #### 範例
 ##### Google Play 版本檢查
  
