@@ -75,8 +75,9 @@ dependencies {
 ###### 伺服器版本檢查
 
 ``` java
+    // 伺服器版本檢查
     new MDVersionChecker()
-        .checkServer("http://pub.mysoqi.com/appupdate/index1.php", "com.agenttw", "1.32.060")
+        .checkServer("http://pub.mysoqi.com/appupdate/index1.php", "com.agenttw", "1.33.050")
         // optional : 設定讀取視窗
         .setLoadingView(this, "Check", "Version checking")
         // optional : 設定更新視窗
@@ -89,17 +90,20 @@ dependencies {
                 finish();
             }
         })
+        // optional : 是否逐步比對版本名稱
+        .isStepCompare(true)
         // 開始檢查
         .check(new MDVersionChecker.CheckVersionCallback() {
             @Override
             public void same(Map<String, String> infoMap) {
                 Log.i(TAG, "same: " + infoMap.toString());
-        
+          
             @Override
             public void different(Map<String, String> infoMap, AlertDialog.Builder updateDialog) {
                 Log.i(TAG, "different: " + infoMap.toString());
+                updateDialog.setMessage("Your version is " + "1.33.050" + ", Server version is " + infoMap.get("verName"));
                 updateDialog.show();
-        
+          
             @Override
             public void error(String error) {
                 Log.i(TAG, "error: " + error);

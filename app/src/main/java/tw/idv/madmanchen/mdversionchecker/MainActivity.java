@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
                         finish();
                     }
                 })
+                // optional : 是否逐步比對版本名稱
                 .isStepCompare(true)
                 // 開始檢查
                 .check(new MDVersionChecker.CheckVersionCallback() {
