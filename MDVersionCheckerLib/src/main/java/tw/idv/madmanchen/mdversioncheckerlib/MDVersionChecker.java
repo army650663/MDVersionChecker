@@ -139,6 +139,14 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
         return this;
     }
 
+    /**
+     * 是否逐步比較版本
+     * <p>
+     * 系統版本 1.33.060 伺服器版本 1.33.061
+     * 1 = 1, 33 = 33, 060 < 061 return false
+     *
+     * @param isStepCompare 是否逐步比較
+     */
     public MDVersionChecker isStepCompare(boolean isStepCompare) {
         this.isStepCompare = isStepCompare;
         return this;
@@ -228,8 +236,10 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
         }
         infoMap.put("apkUrl", url);
         infoMap.put("verName", verName);
+
         return verName;
     }
+
 
     /**
      * 至 Server 取得版本名
