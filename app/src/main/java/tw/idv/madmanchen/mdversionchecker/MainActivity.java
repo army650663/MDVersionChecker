@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         mContext = this;
         // 伺服器版本檢查
         new MDVersionChecker()
-                .checkServer("http://pub.mysoqi.com/appupdate/index1.php", "com.agenttw", "1.32.060")
+                .checkServer("http://pub.mysoqi.com/appupdate/index1.php", "com.agenttw", "1.33.050")
                 // optional : 設定讀取視窗
                 .setLoadingView(this, "Check", "Version checking")
                 // optional : 設定更新視窗
@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
                         finish();
                     }
                 })
+                .isStepCompare(true)
                 // 開始檢查
                 .check(new MDVersionChecker.CheckVersionCallback() {
                     @Override
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void different(Map<String, String> infoMap, AlertDialog.Builder updateDialog) {
                         Log.i(TAG, "different: " + infoMap.toString());
+                        updateDialog.setMessage("Your version is " + "1.33.050" + ", Server version is " + infoMap.get("verName"));
                         updateDialog.show();
                     }
 
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         // Google Play 版本檢查
-        new MDVersionChecker()
+       /* new MDVersionChecker()
                 .checkGooglePlay("com.agenttw", "1.11.11")
                 .setLoadingView(mContext, "Google play version check", "Version checking")
                 .setUpdateDialog(mContext, "Need update", "Have new version!")
@@ -74,6 +76,6 @@ public class MainActivity extends AppCompatActivity {
                     public void error(String error) {
                         Log.i(TAG, "error: " + error);
                     }
-                });
+                });*/
     }
 }

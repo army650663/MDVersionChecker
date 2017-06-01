@@ -78,6 +78,7 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
     private String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
     private String providerName = "fileprovider";
     private int checkType = 0;
+    private boolean isStepCompare;
 
 
     /**
@@ -135,6 +136,11 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
         mAlertDialog.setTitle(title);
         mAlertDialog.setMessage(msg);
         mAlertDialog.setCancelable(false);
+        return this;
+    }
+
+    public MDVersionChecker isStepCompare(boolean isStepCompare) {
+        this.isStepCompare = isStepCompare;
         return this;
     }
 
@@ -401,10 +407,30 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
                 verName = getVerNameFromServer(strings[0]);
                 break;
         }
-        if (verName == null) {
-            return null;
+        if (verName != null) {
+            if (isStepCompare) {
+                String[] systemVerNameArr = this.verName.split("\\.");
+                String[] serverVerNameArr = verName.split("\\.");
+                if (systemVerNameArr.length == serverVerNameArr.length) {
+                    for (int i = 0; i < systemVerNameArr.length; i++) {
+                        int systemInt = Integer.parseInt(systemVerNameArr[i]);
+                        int serverInt = Integer.parseInt(serverVerNameArr[i]);
+                        Log.i(TAG, "doInBackground: " + this.verName + ":" + verName);
+                        Log.i(TAG, "doInBackground: " + systemInt + ":" + serverInt);
+                        if (systemInt < serverInt) {
+                            return false;
+                        }
+                    }
+                    return true;
+                } else {
+                    return this.verName.equals(verName);
+                }
+            } else {
+                return this.verName.equals(verName);
+            }
         }
-        return this.verName.equals(verName);
+        return null;
+
     }
 
     @Override
