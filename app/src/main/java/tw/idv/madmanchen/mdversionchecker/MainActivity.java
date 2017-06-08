@@ -1,7 +1,6 @@
 package tw.idv.madmanchen.mdversionchecker;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,16 +25,9 @@ public class MainActivity extends AppCompatActivity {
                 .setLoadingView(this, "Check", "Version checking")
                 // optional : 設定更新視窗
                 .setUpdateDialog(this, "System info", "Need to update")
-                // optional : 設定使用者取消動作
-                .setCancelButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        finish();
-                    }
-                })
                 // optional : 是否逐步比對版本名稱
                 .isStepCompare(true)
+                .isCompel(true)
                 // 開始檢查
                 .check(new MDVersionChecker.CheckVersionCallback() {
                     @Override

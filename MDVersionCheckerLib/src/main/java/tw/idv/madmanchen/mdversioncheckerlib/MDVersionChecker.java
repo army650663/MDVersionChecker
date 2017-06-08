@@ -79,6 +79,7 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
     private String providerName = "fileprovider";
     private int checkType = 0;
     private boolean isStepCompare;
+    private boolean isCompel;
 
 
     /**
@@ -173,6 +174,11 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
     public MDVersionChecker setCancelButton(String btnText, DialogInterface.OnClickListener listener) {
         cancelBtnText = btnText;
         mCanceloOnClickListener = listener;
+        return this;
+    }
+
+    public MDVersionChecker isCompel(boolean isCompel) {
+        this.isCompel = isCompel;
         return this;
     }
 
@@ -456,7 +462,9 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
                 } else {
                     if (mAlertDialog != null) {
                         mAlertDialog.setNegativeButton(updateBtnText, mUpdateOnClickListener != null ? mUpdateOnClickListener : getDefaultUpdateOnClickListener());
-                        mAlertDialog.setNeutralButton(cancelBtnText, mCanceloOnClickListener != null ? mCanceloOnClickListener : getDefaultCancelOnClickListener());
+                        if (!isCompel) {
+                            mAlertDialog.setNeutralButton(cancelBtnText, mCanceloOnClickListener != null ? mCanceloOnClickListener : getDefaultCancelOnClickListener());
+                        }
                     }
                     mVersionCallback.different(infoMap, mAlertDialog);
                 }
