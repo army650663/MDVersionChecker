@@ -15,7 +15,7 @@ allprojects {
 	 
 ``` gradle
 dependencies {
-    compile 'com.github.army650663:MDVersionChecker:v1.0.2'
+    compile 'com.github.army650663:MDVersionChecker:v1.0.3'
 }
 ```
 
