@@ -55,15 +55,7 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
     public @interface CheckType {
     }
 
-    public interface CheckVersionCallback {
-        void same(Map<String, String> infoMap);
-
-        void different(Map<String, String> infoMap, AlertDialog.Builder updateDialog);
-
-        void error(String error);
-    }
-
-    private CheckVersionCallback mVersionCallback;
+    private VerCheckCallback mVersionVerCheckCallback;
     private ProgressDialog mProgressDialog;
     private AlertDialog.Builder mAlertDialog;
 
@@ -209,10 +201,10 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
     /**
      * 開始檢查
      *
-     * @param callback 檢查回傳
+     * @param verCheckCallback 檢查回傳
      */
-    public void check(CheckVersionCallback callback) {
-        this.mVersionCallback = callback;
+    public void check(VerCheckCallback verCheckCallback) {
+        this.mVersionVerCheckCallback = verCheckCallback;
         execute(pkgName);
     }
 
@@ -236,8 +228,8 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
                     .ownText();
         } catch (Exception e) {
             e.printStackTrace();
-            if (mVersionCallback != null) {
-                mVersionCallback.error(e.getMessage());
+            if (mVersionVerCheckCallback != null) {
+                mVersionVerCheckCallback.error(e.getMessage());
             }
         }
         infoMap.put("apkUrl", url);
@@ -279,11 +271,13 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
                     String msg = jsonObject.optString("msg");
                     if (result) {
                         JSONObject contentJObj = jsonObject.optJSONObject("content");
-                        verName = contentJObj.optString("verName");
-                        apkUrl = contentJObj.optString("apkUrl");
+                        verName = contentJObj.optString("vername_android");
+                        apkUrl = contentJObj.optString("apkurl");
+                        Log.i(TAG, "getVerNameFromServer: " + contentJObj.toString());
+                        Log.i(TAG, "getVerNameFromServer: " + apkUrl);
                     } else {
-                        if (mVersionCallback != null) {
-                            mVersionCallback.error(msg);
+                        if (mVersionVerCheckCallback != null) {
+                            mVersionVerCheckCallback.error(msg);
                         }
                     }
                 }
@@ -292,11 +286,12 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            if (mVersionCallback != null) {
-                mVersionCallback.error(e.getMessage());
+            if (mVersionVerCheckCallback != null) {
+                mVersionVerCheckCallback.error(e.getMessage());
             }
         }
         infoMap.put("apkUrl", apkUrl);
+        Log.i(TAG, "getVerNameFromServer: " + apkUrl);
         infoMap.put("verName", verName);
         return verName;
     }
@@ -323,6 +318,7 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
                             mProgressDialog.dismiss();
                         }
                         final String apkUrl = infoMap.get("apkUrl");
+                        Log.i(TAG, apkUrl);
                         final String fileName = URLUtil.guessFileName(apkUrl, null, null);
                         final File apkFile = new File(downloadPath, fileName);
                         final Context context = mAlertDialog.getContext();
@@ -378,8 +374,8 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
                                         }
                                     } catch (Exception e) {
                                         e.printStackTrace();
-                                        if (mVersionCallback != null) {
-                                            mVersionCallback.error(e.getMessage());
+                                        if (mVersionVerCheckCallback != null) {
+                                            mVersionVerCheckCallback.error(e.getMessage());
                                         }
                                     }
                                 }
@@ -455,10 +451,10 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
-        if (mVersionCallback != null) {
+        if (mVersionVerCheckCallback != null) {
             if (aBoolean != null) {
                 if (aBoolean) {
-                    mVersionCallback.same(infoMap);
+                    mVersionVerCheckCallback.same(infoMap);
                 } else {
                     if (mAlertDialog != null) {
                         mAlertDialog.setNegativeButton(updateBtnText, mUpdateOnClickListener != null ? mUpdateOnClickListener : getDefaultUpdateOnClickListener());
@@ -466,7 +462,7 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
                             mAlertDialog.setNeutralButton(cancelBtnText, mCanceloOnClickListener != null ? mCanceloOnClickListener : getDefaultCancelOnClickListener());
                         }
                     }
-                    mVersionCallback.different(infoMap, mAlertDialog);
+                    mVersionVerCheckCallback.different(infoMap, mAlertDialog);
                 }
             }
         }

@@ -8,6 +8,7 @@ import android.util.Log;
 
 import java.util.Map;
 
+import tw.idv.madmanchen.mdversioncheckerlib.VerCheckCallback;
 import tw.idv.madmanchen.mdversioncheckerlib.MDVersionChecker;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         mContext = this;
         // 伺服器版本檢查
         new MDVersionChecker()
-                .checkServer("http://pub.mysoqi.com/appupdate/index1.php", "com.agenttw", "1.33.050")
+                .checkServer("http://pub.mysoqi.com/appupdate/002/", "com.agenttw", "1.33.050")
                 // optional : 設定讀取視窗
                 .setLoadingView(this, "Check", "Version checking")
                 // optional : 設定更新視窗
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
                 .isStepCompare(true)
                 .isCompel(true)
                 // 開始檢查
-                .check(new MDVersionChecker.CheckVersionCallback() {
+                .check(new VerCheckCallback() {
                     @Override
                     public void same(Map<String, String> infoMap) {
                         Log.i(TAG, "same: " + infoMap.toString());

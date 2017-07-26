@@ -15,7 +15,7 @@ allprojects {
 	 
 ``` gradle
 dependencies {
-    compile 'com.github.army650663:MDVersionChecker:1.0.4'
+    compile 'com.github.army650663:MDVersionChecker:1.0.5'
 }
 ```
 
@@ -64,10 +64,8 @@ dependencies {
       "result": true,
       "msg": "",
       "content": {
-        "pkgName": "com.agenttw",
-        "verCode": "33",
-        "verName": "1.33.060",
-        "apkUrl": "http://pub.mysoqi.com/ht_agent/AgentTW.apk"
+        "vername_android": "1.34.060",
+        "apkurl": "http://google.com/AgentTW.apk"
       }
     }
 ```
@@ -77,7 +75,7 @@ dependencies {
 ``` java
     // 伺服器版本檢查
     new MDVersionChecker()
-        .checkServer("http://pub.mysoqi.com/appupdate/index1.php", "com.agenttw", "1.33.050")
+        .checkServer("http://my.server/appupdate/", "com.appname", "1.33.050")
         // optional : 設定讀取視窗
         .setLoadingView(this, "Check", "Version checking")
         // optional : 設定更新視窗
@@ -93,7 +91,7 @@ dependencies {
         // optional : 是否逐步比對版本名稱
         .isStepCompare(true)
         // 開始檢查
-        .check(new MDVersionChecker.CheckVersionCallback() {
+        .check(new VerCheckCallback() {
             @Override
             public void same(Map<String, String> infoMap) {
                 Log.i(TAG, "same: " + infoMap.toString());
