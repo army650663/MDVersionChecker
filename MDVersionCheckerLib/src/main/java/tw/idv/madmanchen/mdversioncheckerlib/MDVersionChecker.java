@@ -421,6 +421,9 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
         }
         if (verName != null) {
             if (isStepCompare) {
+                if (this.verName.equals(verName)) {
+                    return true;
+                }
                 String[] systemVerNameArr = this.verName.split("\\.");
                 String[] serverVerNameArr = verName.split("\\.");
                 if (systemVerNameArr.length == serverVerNameArr.length) {
@@ -429,11 +432,12 @@ public class MDVersionChecker extends AsyncTask<String, Number, Boolean> {
                         int serverInt = Integer.parseInt(serverVerNameArr[i]);
                         Log.i(TAG, "doInBackground: " + this.verName + ":" + verName);
                         Log.i(TAG, "doInBackground: " + systemInt + ":" + serverInt);
-                        if (systemInt < serverInt) {
-                            return false;
+                        // 1.1.0 : 1.0.9
+                        if (systemInt > serverInt) {
+                            return true;
                         }
                     }
-                    return true;
+                    return false;
                 } else {
                     return this.verName.equals(verName);
                 }

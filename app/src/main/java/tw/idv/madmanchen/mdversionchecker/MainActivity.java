@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mContext = this;
         // 伺服器版本檢查
-        new MDVersionChecker()
+        /*new MDVersionChecker()
                 .checkServer("http://pub.mysoqi.com/appupdate/002/", "com.agenttw", "1.33.050")
                 // optional : 設定讀取視窗
                 .setLoadingView(this, "Check", "Version checking")
@@ -47,14 +47,16 @@ public class MainActivity extends AppCompatActivity {
                     public void error(String error) {
                         Log.i(TAG, "error: " + error);
                     }
-                });
+                });*/
 
         // Google Play 版本檢查
-       /* new MDVersionChecker()
-                .checkGooglePlay("com.agenttw", "1.11.11")
+        new MDVersionChecker()
+                .checkGooglePlay("hsinten.com.tw.isoqi_us", "1.1.0")
                 .setLoadingView(mContext, "Google play version check", "Version checking")
                 .setUpdateDialog(mContext, "Need update", "Have new version!")
-                .check(new MDVersionChecker.CheckVersionCallback() {
+                .isStepCompare(true)
+                .isCompel(true)
+                .check(new VerCheckCallback() {
                     @Override
                     public void same(Map<String, String> infoMap) {
                         Log.i(TAG, "same: " + infoMap.toString());
@@ -70,6 +72,6 @@ public class MainActivity extends AppCompatActivity {
                     public void error(String error) {
                         Log.i(TAG, "error: " + error);
                     }
-                });*/
+                });
     }
 }
